@@ -34,25 +34,25 @@ clamp(x, low, high) = min(max(x, low), high);
 
 FIR_TAP_COUNT = 8;
 
-enabled = checkbox("h:/v:[1]/[1]Echo Enabled");
+bypass = checkbox("h:/v:[1]/[1]Bypass Echo");
 normalized = checkbox("h:/v:[1]/[2]Normalize Volumes");
 output_vol = 1;	// vslider("h:/v:[1]/[3]Output Volume", 2, 1, 2, 0.1);
 
 // EDL register
-MAXBLOCKS = 15;		// * 16ms/blk = 1024ms
-nblocks = vslider("h:/v:[1]/[0]Echo blocks (16ms)", 5, 0, MAXBLOCKS, 1):rint;
+MAX_BLOCKS = 15;		// * 16ms/blk = 1024ms
+nblocks = vslider("h:/v:[1]/[0]Echo blocks (16ms)", 5, 0, MAX_BLOCKS, 1):rint;
 
-mvolSign = checkbox("h:/v:[2]Master Volume/Negative"):nsign;
-mvolR =  vslider("h:/v:[2]Master Volume/Master Volume", 63, 0, 127, 1) * mvolSign:rint;
-mvolL = checkbox("h:/v:[2]Master Volume/Surround") : nsign(_)*mvolR;
+mvolSign = checkbox("h:/v:[2]Dry Volume/[2]Negative"):nsign;
+mvolR =  vslider("h:/v:[2]Dry Volume/[1]Dry Volume", 63, 0, 127, 1) * mvolSign:rint;
+mvolL = checkbox("h:/v:[2]Dry Volume/[3]Surround") : nsign(_)*mvolR;
 
-evolSign = checkbox("h:/v:[3]Echo Volume/Negative"):nsign;
-evolR =  vslider("h:/v:[3]Echo Volume/Echo Volume", 25, 0, 127, 1) * evolSign:rint;
-evolL = checkbox("h:/v:[3]Echo Volume/Surround") : nsign(_)*evolR;
+evolSign = checkbox("h:/v:[3]Wet Volume/[2]Negative"):nsign;
+evolR =  vslider("h:/v:[3]Wet Volume/[1]Wet Volume", 25, 0, 127, 1) * evolSign:rint;
+evolL = checkbox("h:/v:[3]Wet Volume/[3]Surround") : nsign(_)*evolR;
 
-efbSign = checkbox("h:/v:[4]Echo Feedback/Negative"):nsign;
-efbR =  vslider("h:/v:[4]Echo Feedback/Echo Feedback", 70, 0, 127, 1) * efbSign:rint;
-efbL = checkbox("h:/v:[4]Echo Feedback/Surround (not on SNES)") : nsign(_)*efbR;
+efbSign = checkbox("h:/v:[4]Echo Feedback/[2]Negative"):nsign;
+efbR =  vslider("h:/v:[4]Echo Feedback/[1]Echo Feedback", 70, 0, 127, 1) * efbSign:rint;
+efbL = checkbox("h:/v:[4]Echo Feedback/[3]Surround (not on SNES)") : nsign(_)*efbR;
 
 
 DEFAULT_FIR = 127,0,0,0,0,0,0,0;
@@ -191,18 +191,18 @@ snes_feedback(x, feedback) = if(nblocks == 0,
 // **** AUDIO MIXER
 
 snes_echo(signal, mvol, evol, feedback, max_vol) = (
-	if(enabled,
-		echo * if(normalized, 1/max_vol, output_vol),
+	if(bypass == 0,
+		output * if(normalized, 1/max_vol, output_vol),
 		signal
 	)
 ) with {
- 	echo = volf(
+ 	output = volf(
  		mvol*signal + evol*snes_feedback(signal, feedback)
  	);
 };
 
 
-nbgraph = vbargraph("h:/[6]Echo blocks", 0, MAXBLOCKS);
+nbgraph = vbargraph("h:/[6]Echo blocks", 0, MAX_BLOCKS);
 srgraph = vbargraph("h:/[6]Sample Rate", 32000, 48000);
 esnesgraph = vbargraph("h:/[7]SNES samples", 0, 32000);
 elengraph = vbargraph("h:/[8]PC samples", 0, 32000);
