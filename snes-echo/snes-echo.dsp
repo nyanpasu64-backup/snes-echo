@@ -42,17 +42,16 @@ output_vol = 1;	// vslider("h:/v:[1]/[3]Output Volume", 2, 1, 2, 0.1);
 MAX_BLOCKS = 15;		// * 16ms/blk = 1024ms
 nblocks = vslider("h:/v:[1]/[0]Echo blocks (16ms)", 5, 0, MAX_BLOCKS, 1):rint;
 
-mvolSign = checkbox("h:/v:[2]Dry Volume/[2]Negative"):nsign;
-mvolR =  vslider("h:/v:[2]Dry Volume/[1]Dry Volume", 63, 0, 127, 1) * mvolSign:rint;
-mvolL = checkbox("h:/v:[2]Dry Volume/[3]Surround") : nsign(_)*mvolR;
+mvolSign = checkbox("h:/v:[2]Dry Volume/[3]Negative"):nsign;
+mvolL =  vslider("h:/v:[2]Dry Volume/h:/(L)", 63, 0, 127, 1) * mvolSign:rint;
+mvolR =  vslider("h:/v:[2]Dry Volume/h:/(R)", 63, 0, 127, 1) * mvolSign:rint;
 
-evolSign = checkbox("h:/v:[3]Wet Volume/[2]Negative"):nsign;
-evolR =  vslider("h:/v:[3]Wet Volume/[1]Wet Volume", 25, 0, 127, 1) * evolSign:rint;
-evolL = checkbox("h:/v:[3]Wet Volume/[3]Surround") : nsign(_)*evolR;
+evolSign = checkbox("h:/v:[3]Wet Volume/[3]Negative"):nsign;
+evolL  =  vslider("h:/v:[3]Wet Volume/h:/[1](L)", 25, 0, 127, 1) * evolSign:rint;
+evolR =  vslider("h:/v:[3]Wet Volume/h:/[2](R)", 25, 0, 127, 1) * evolSign:rint;
 
 efbSign = checkbox("h:/v:[4]Echo Feedback/[2]Negative"):nsign;
 efbR =  vslider("h:/v:[4]Echo Feedback/[1]Echo Feedback", 70, 0, 127, 1) * efbSign:rint;
-efbL = checkbox("h:/v:[4]Echo Feedback/[3]Surround (not on SNES)") : nsign(_)*efbR;
 
 
 DEFAULT_FIR = 127,0,0,0,0,0,0,0;
@@ -207,9 +206,9 @@ srgraph = vbargraph("h:/[6]Sample Rate", 32000, 48000);
 esnesgraph = vbargraph("h:/[7]SNES samples", 0, 32000);
 elengraph = vbargraph("h:/[8]PC samples", 0, 32000);
 
-process(l,r) =
-	(snes_echo(l, mvolL, evolL, efbL, max_vol)),
-	(snes_echo(r, mvolR, evolR, efbR, max_vol))
+process(in) =
+	(snes_echo(in, mvolL, evolL, efbR, max_vol)),
+	(snes_echo(in, mvolR, evolR, efbR, max_vol)) <: _,_
 	// : attach(_, nbgraph(nblocks))
 	// : attach(_, srgraph(SR))
 	// : attach(_, esnesgraph(echo_len_snes))
