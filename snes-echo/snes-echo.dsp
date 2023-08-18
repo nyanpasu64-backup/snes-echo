@@ -206,9 +206,9 @@ srgraph = vbargraph("h:/[6]Sample Rate", 32000, 48000);
 esnesgraph = vbargraph("h:/[7]SNES samples", 0, 32000);
 elengraph = vbargraph("h:/[8]PC samples", 0, 32000);
 
-process(l,r) =
-	(snes_echo(l, mvolL, evolL, efbR, max_vol)),
-	(snes_echo(r, mvolR, evolR, efbR, max_vol))
+process(in) =
+	(snes_echo(in, mvolL, evolL, efbR, max_vol)),
+	(snes_echo(in, mvolR, evolR, efbR, max_vol))
 	// : attach(_, nbgraph(nblocks))
 	// : attach(_, srgraph(SR))
 	// : attach(_, esnesgraph(echo_len_snes))
